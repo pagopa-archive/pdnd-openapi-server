@@ -9,7 +9,7 @@ connexion = {extras = ["swagger-ui"], version = "*"}
 #gevent = "*"
 #greenlet = {version = "*", platform_python_implementation="=='CPython'"}
 six = ">=1.9"
-Flask = "==0.10.1"
+Flask = "==1.0.2"
 python-jose = "*"
 
 [dev-packages]
