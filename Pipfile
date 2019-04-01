@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+connexion = {extras = ["swagger-ui"], version = "*"}
+#connexion[] = "*"
+#gevent = "*"
+#greenlet = {version = "*", platform_python_implementation="=='CPython'"}
+six = ">=1.9"
+Flask = "==0.10.1"
+python-jose = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "2.7"

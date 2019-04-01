@@ -1,0 +1,77 @@
+openapi: 3.0.0
+info:
+  title: JWT Example
+  version: '1.0'
+info:
+  contact:
+    email: alessandro@teamdigitale.governo.it
+    name: Alessandro Ercolani
+  description: |
+    #### Documentazione
+    Il servizio si propone di esporre tramite openapi3 alcune API del PDND - Daf
+    #### Note
+    Il servizio richiede autenticazione tramite Bearer o Basic Auth previa registrazione sul portale
+     https://dataportal.daf.teamdigitale.governo.it , e va' usato rispettando gli
+    header di throttling esposti in conformita' alle Linee Guida del Modello di interoperabilita'.
+    #### Informazioni tecniche ed esempi
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: OpenApi Daf.
+  version: 1.0.0
+  x-api-id: 00000000-0000-0000-0000-000000000000
+  x-audience:
+  - public
+  x-summary: Questo servizio espone le API PDND.
+servers:
+- description: Test server
+  url: https://api.daf.teamdigitale.it/pdnd-openapi
+- description: Development server
+  url: http://localhost:8080/pdnd-openapi
+tags:
+- description: Retrieve informations
+  externalDocs:
+    url: https://dataportal.daf.teamdigitale.governo.it 
+  name: public
+paths:
+  /auth/{user_id}:
+    get:
+      summary: Return JWT token
+      operationId: app.generate_token
+      parameters:
+      - name: user_id
+        description: User unique identifier
+        in: path
+        required: true
+        example: 12
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: JWT token
+          content:
+            'text/plain':
+              schema:
+                type: string
+  /secret:
+    get:
+      summary: Return secret string
+      operationId: app.get_secret
+      responses:
+        '200':
+          description: secret response
+          content:
+            'text/plain':
+              schema:
+                type: string
+      security:
+      - jwt: ['secret']
+
+components:
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      x-bearerInfoFunc: app.decode_token

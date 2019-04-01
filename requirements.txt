@@ -1,0 +1,5 @@
+connexion[swagger-ui]
+python-jose[cryptography]
+six>=1.9
+Flask>=0.10.1
+requests==
