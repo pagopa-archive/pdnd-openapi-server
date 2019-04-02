@@ -1,0 +1,110 @@
+{
+  "dcatapit": {
+    "privatex": true,
+    "name": "test_for_notebook",
+    "title": "test for notebook",
+    "author": "d_ale",
+    "identifier": "test_for_notebook",
+    "alternate_identifier": "test_for_notebook",
+    "notes": "test for notebook",
+    "theme": "REGI",
+    "publisher_name": "daf_data",
+    "publisher_identifier": "daf_data",
+    "modified": "08/02/2019",
+    "holder_name": "daf_data",
+    "holder_identifier": "daf_data",
+    "license_id": "Creative Commons Attribuzione 4.0 Internazionale (CC BY 4.0)",
+    "organization": {
+      "name": "daf_data"
+    },
+    "owner_org": "daf_data",
+    "frequency": "0 */3 * ? * *",
+    "groups": [],
+    "resources": [],
+    "relationships_as_object": [],
+    "relationships_as_subject": [],
+    "tags": []
+  },
+  "dataschema": {
+    "avro": {
+      "namespace": "daf://daf_data/REGI/test for notebook",
+      "name": "test for notebook",
+      "aliases": [
+        "test for notebook"
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "`type`": "int"
+        }
+      ],
+      "`type`": "record"
+    },
+    "kyloSchema": "",
+    "flatSchema": [
+      {
+        "name": "id",
+        "`type`": "int",
+        "metadata": {
+          "type": "int",
+          "desc": "",
+          "tag": [],
+          "format_std": {
+            "conv": []
+          },
+          "semantics": {
+            "id": ""
+          },
+          "field_profile": {},
+          "personal": {}
+        }
+      }
+    ]
+  },
+  "operational": {
+    "group_own": "daf_data",
+    "acl": [],
+    "theme": "REGI",
+    "subtheme": "europa",
+    "file_type": "csv",
+    "dataset_proc": {
+      "merge_strategy": "sync",
+      "scheduling_strategy": "TIMER_DRIVEN",
+      "cron": "3 min",
+      "dataset_type": "batch",
+      "read_type": "last_update"
+    },
+    "type_info": {
+      "dataset_type": "primitive"
+    },
+    "read_type": "last_update",
+    "input_src": {
+      "srv_push": [
+        {
+          "name": "ws_hdfs",
+          "access_token": null,
+          "username": "d_ale",
+          "url": "https://api.daf.teamdigitale.it/hdfs/proxy/uploads/d_ale/REGI/europa/test_for_notebook/",
+          "param": "csv",
+          "password": "xxxxxxx"
+        }
+      ]
+    },
+    "storage_info": {
+      "hdfs": {
+        "name": "hdfs_daf",
+        "path": null,
+        "param": null
+      }
+    },
+    "dataset_type": "batch",
+    "is_vocabulary": false,
+    "is_std": false,
+    "ingestion_pipeline": [
+      {
+        "nome": "DAF Ingestion Pipeline default",
+        "parametro": ""
+      }
+    ]
+  }
+}

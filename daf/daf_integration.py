@@ -3,7 +3,6 @@ import json
 import time
 import datetime
 
-
 FLATSCHEMA_TEMPLATE = json.loads("""{
         "name": "id",
         "`type`": "int",
@@ -30,10 +29,10 @@ def generateFlatSchema(fields, FLATSCHEMA_TEMPLATE):
         flatSchema.append(FLATSCHEMA_TEMPLATE)
     return flatSchema
 
-def isPresentOnDaf(name):
-    isPresentUrl = "http://localhost:9001/catalog-manager/v1/catalog-ds/is_present/" + name
+def isPresentOnDaf(name, header):
+    isPresentUrl = "https://api.daf.teamdigitale.it/catalog-manager/v1/catalog-ds/is_present/" + name
     payload = ""
-    headers = {'authorization': 'Basic XXXXXXXXXX'}
+    headers = {'authorization': header}
     response = requests.request("GET", isPresentUrl, data=payload, headers=headers)
     print(response.status_code)
     print(name)
@@ -42,11 +41,11 @@ def isPresentOnDaf(name):
     return True
 
 
-def getKyloSchema(file, fileType = 'csv'):
+def getKyloSchema(file, header, fileType = 'csv', ):
     kyloInferUrl = "https://api.daf.teamdigitale.it/dati-gov/v1/infer/kylo/csv"
     if fileType == 'json':
        kyloInferUrl = "https://api.daf.teamdigitale.it/dati-gov/v1/infer/kylo/json"
-    headers = {'authorization': 'Basic XXXXXXXXXX'}
+    headers = {'authorization': header}
     files = {'upfile': file}
     response = requests.post(kyloInferUrl, files=files, headers=headers)
     print(response.status_code)
@@ -56,13 +55,13 @@ def getKyloSchema(file, fileType = 'csv'):
        return json.loads(response.text)
     return {"error" : "error"}
 
-def createKyloFeed(metacatalog):
+def createKyloFeed(metacatalog, header):
     startKyloUrl = "https://api.daf.teamdigitale.it/catalog-manager/v1/kylo/feed/csv"
     payload = ""
     headers = {
       'content-type': 'application/json', 
       'accept': 'application/json',
-      'authorization': 'Basic XXXXXXXXXX'
+      'authorization': header
     }
     print(json.dumps(metacatalog))
     response = requests.post(startKyloUrl, data=json.dumps(metacatalog), headers=headers)
@@ -74,12 +73,12 @@ def createKyloFeed(metacatalog):
        return 200
     return 400
 
-def createMetacalog(metacatalog):
+def createMetacalog(metacatalog, header):
     startKyloUrl = "https://api.daf.teamdigitale.it/catalog-manager/v1/catalog-ds/add"
     headers = {
       'Content-Type': 'application/json', 
       'Accept': 'application/json',
-      'authorization': 'Basic XXXXXXXXXX'
+      'authorization': header
       }
     response = requests.post(startKyloUrl, data=json.dumps(metacatalog), headers=headers)
     print(response.status_code)
@@ -89,7 +88,21 @@ def createMetacalog(metacatalog):
        return 200
     return 400
 
-def saveOrUpdateFile(file, metacatalog):
+def startFeedJob(orgName,datasetName, header):
+    starNifiUrl = "https://api.daf.teamdigitale.it/catalog-manager/v1/nifi/start/" + orgName +"/" + datasetName
+    payload = ""
+    headers = {
+      'Content-Type': 'application/json', 
+      'Accept': 'application/json',
+      'authorization': header
+      }
+    response = requests.request("GET", starNifiUrl, data=payload, headers=headers)
+    print(response.status_code)
+    if response.status_code == 200:
+       return True
+    return False
+
+def saveOrUpdateFile(file, metacatalog, header):
   #url = "https://api.daf.teamdigitale.it/hdfs/proxy/uploads/d_ale/GOVE/amministrazione/anpr_previsioni_grezze_test/anpr_raw_forecast_18_months_28102018_182850.csv?op=CREATE"
   genericUrl = metacatalog['operational']['input_src']['srv_push'][0]['url']
   ts = str(int(time.time()))
@@ -100,7 +113,7 @@ def saveOrUpdateFile(file, metacatalog):
   payload = file
   headers = {
       'content-type': "text/csv",
-      'authorization': "Basic XXXXXXXXXX"
+      'authorization': header
       }
   response = requests.request("PUT", url, data=payload, headers=headers)
   if response.status_code == 200:
@@ -111,7 +124,7 @@ def saveOrUpdateFile(file, metacatalog):
 def extractFields(kyloSchema):
     fields = kyloSchema['fields']
     newFields = map(lambda d: {"name" : d['name'], "`type`" : d['derivedDataType']}, fields)
-    return newFields
+    return list(newFields)
 
 def loadTemplate(pathTemplate):
     jsondata=open(pathTemplate).read()
@@ -146,9 +159,11 @@ def setDataSchema(template, form, nameSingle, fields, kyloSchema):
     return template
 
 def setOperational(template, form, nameSingle):
+    print(template)
+    print(form)
     fileType = 'csv'
-    if form['fileType'] is not None:
-      fileType = form['fileType']
+    #if form['fileType'] is not None:
+    #  fileType = form['fileType']
     template['operational']['group_own'] = form['org']
     template['operational']['theme'] = form['theme']
     template['operational']['subtheme'] = form['subtheme']
@@ -161,3 +176,40 @@ def setOperational(template, form, nameSingle):
     return template
 
 
+'''
+Dataset Param to pass:
+name
+theme
+subtheme
+org
+user 
+description
+'''
+def saveInDaf(file,form,header):
+        fileOriginal = file
+        fileToUpload = fileOriginal
+        originalKyloSchema = getKyloSchema(fileOriginal,header)
+        kyloSchema = json.loads(originalKyloSchema)
+        print(kyloSchema)
+        fields = extractFields(kyloSchema)
+        template = loadTemplate('./template_catalog.json')
+        nameSingle = form['name'].replace(' ', '_')
+        if not isPresentOnDaf(nameSingle, header):
+            print('go forward')
+            setDcatapit(template, form, nameSingle)
+            setDataSchema(template, form, nameSingle, fields, originalKyloSchema)
+            setOperational(template, form, nameSingle)
+            print(template)
+            created = createKyloFeed(template, header)
+            if  created == 200:
+                print('creating on mongo')
+                catalogCreated = createMetacalog(template, header)
+                print('created on mongo')
+                if catalogCreated == 200:
+                    print('saving on hdfs')
+                    savedStatus = saveOrUpdateFile(fileToUpload, template, header) 
+                    if savedStatus == 200:
+                      print('saved on hdfs')
+                      if startFeedJob(form['org'],nameSingle,header):
+                        return json.dumps({'success' : "created"})  
+        return json.dumps({'error' : 'error'})

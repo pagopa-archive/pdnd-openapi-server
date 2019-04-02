@@ -90,7 +90,56 @@ paths:
             <<: *ratelimit-headers
       summary: Return pdnd jwt token
       tags:
-      - Login
+      - Search
+  /dataset/save:
+    post:
+      description: |
+        Return JWT token
+      operationId: app.dataset_save
+      security:
+        - jwt: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              x-body-name: file
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                name:
+                  type: string
+                theme:
+                  type: string
+                subtheme:
+                  type: string
+                org:
+                  type: string
+                user:
+                  type: string
+                description:
+                  type: string
+              required:
+                - file
+          #description: filter to use in search
+          #required: true
+      responses:
+        <<: *common-responses
+        '200':
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchResult'
+          description: |
+            JWT token.
+          headers:
+            <<: *ratelimit-headers
+      summary: Return pdnd jwt token
+      tags:
+      - Search
 components:
   securitySchemes:
     jwt:

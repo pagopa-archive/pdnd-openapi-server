@@ -5,6 +5,7 @@ import six
 from werkzeug.exceptions import Unauthorized
 import requests
 import json
+from daf.daf_integration import saveInDaf
 
 def forward_token(token):
     return  {'sub': 'user1', 'scope': ''}
@@ -30,8 +31,14 @@ def basic_auth(username, password, required_scopes=None):
     print(header)
     return  {'sub': 'user1', 'scope': ''}
 
+def dataset_save(file):
+    print(file)
+    print(connexion.request.form)
+    header = connexion.request.headers['Authorization']
+    saveInDaf(file,connexion.request.form, header)
+    return "ale"
 
 if __name__ == '__main__':
     app = connexion.FlaskApp(__name__)# specification_dir='openapi/', options={"swagger_ui": True})
-    app.add_api('daf-openapi.yaml')
+    app.add_api('daf-openapi.yaml') #, validate_responses=True)
     app.run(port=8080)
