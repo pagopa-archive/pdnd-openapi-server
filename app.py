@@ -4,54 +4,24 @@ import connexion
 import six
 from werkzeug.exceptions import Unauthorized
 import requests
+import json
 
-from jose import JWTError, jwt
+def forward_token(token):
+    return  {'sub': 'user1', 'scope': ''}
 
-JWT_ISSUER = 'com.zalando.connexion'
-JWT_SECRET = 'change_this'
-JWT_LIFETIME_SECONDS = 600
-JWT_ALGORITHM = 'HS256'
-
-
-def generate_token(user_id):
-    timestamp = _current_timestamp()
-    payload = {
-        "iss": JWT_ISSUER,
-        "iat": int(timestamp),
-        "exp": int(timestamp + JWT_LIFETIME_SECONDS),
-        "sub": str(user_id),
-    }
-
-    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
-
-
-def decode_token(token):
-    try:
-        return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-    except JWTError as e:
-        six.raise_from(Unauthorized, e)
-
-
-def get_secret(user, token_info):
-    return '''
-    You are user_id {user} and the secret is 'wbevuec'.
-    Decoded token claims: {token_info}.
-    '''.format(user=user, token_info=token_info)
-
-
-def _current_timestamp():
-    return int(time.time())
+def public_data_search(**filters):
+    url = "https://api.daf.teamdigitale.it/dati-gov/v1/public/elasticsearch/search"
+    headers = {'Content-Type': 'application/json', 'Accept': 'application/json'} #'Authorization': header}
+    print(filters['filters'])
+    response = requests.post(url, data=json.dumps(filters['filters']), headers=headers)
+    print(response.json())
+    return response.json()
 
 def get_token():
-    # https://api.daf.teamdigitale.it/security-manager/v1/token
-    print("token")
     header = connexion.request.headers['Authorization']
     url = "https://api.daf.teamdigitale.it/security-manager/v1/token"
     headers = {'authorization': header}
     response = requests.request("GET", url, headers=headers)
-    print(response)
-    print(response.text)
-    print(response.encoding)
     return response.text
 
 def basic_auth(username, password, required_scopes=None):
