@@ -96,7 +96,7 @@ def startFeedJob(orgName,datasetName, header):
       'Accept': 'application/json',
       'authorization': header
       }
-    response = requests.request("GET", starNifiUrl, data=payload, headers=headers)
+    response = requests.request("GET", starNifiUrl, headers=headers)
     print(response.status_code)
     if response.status_code == 200:
        return True

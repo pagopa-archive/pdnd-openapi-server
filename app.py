@@ -7,6 +7,8 @@ import requests
 import json
 from daf.daf_integration import saveInDaf
 
+def status():
+
 def forward_token(token):
     return  {'sub': 'user1', 'scope': ''}
 
