@@ -4,7 +4,7 @@ This server exposes API from [PDND](https://dataportal.daf.teamdigitale.it/) acc
 
 ### Launch
 ```
-pip3 install
+pip3 install -r requirements.txt
 python3 app.py
 ```
 connect to http://localhost:8080/pdnd-api/ui/
