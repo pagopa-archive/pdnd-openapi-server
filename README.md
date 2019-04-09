@@ -19,3 +19,4 @@ cd pdnd-openapi-server
 docker build -t pdnd-openapi-server .
 docker run -p 8080:8080 pdnd-openapi-server
 ```
+open your browser at [http://localhost:8080/pdnd-openapi/ui/](http://localhost:8080/pdnd-openapi/ui/)

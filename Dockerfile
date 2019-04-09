@@ -8,7 +8,7 @@ RUN apt-get install -y git-core
 
 RUN git clone https://github.com/teamdigitale/pdnd-openapi-server.git
 
-WORKDIR /nteract
+WORKDIR /pdnd-openapi-server
 
 RUN pip3 install -r requirements.txt
 
