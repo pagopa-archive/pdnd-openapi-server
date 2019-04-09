@@ -8,3 +8,14 @@ pip3 install -r requirements.txt
 python3 app.py
 ```
 connect to http://localhost:8080/pdnd-api/ui/
+
+### Docker 
+
+Docker MUST be installed on your local machine
+
+```
+git clone https://github.com/teamdigitale/pdnd-openapi-server.git
+cd pdnd-openapi-server
+docker build -t pdnd-openapi-server .
+docker run -p 8080:8080 pdnd-openapi-server
+```

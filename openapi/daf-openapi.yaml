@@ -39,6 +39,28 @@ servers:
   - description: Test server
     url: https://api.daf.teamdigitale.it/pdnd-openapi
 paths:
+  /status:
+    get:
+      description: |
+        Return JWT token
+      operationId: app.status
+      responses:
+        <<: *common-responses
+        '200':
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+          description: |
+            Current status of api.
+          headers:
+            <<: *ratelimit-headers
+      summary: Return status from server
+      tags:
+      - Status
   /jwt:
     get:
       description: |
@@ -50,9 +72,12 @@ paths:
         <<: *common-responses
         '200':
           content:
-            'text/plain':
+            'application/json':
               schema:
-                type: string
+                type: object
+                properties:
+                  jwt:
+                    type: string
           description: |
             JWT token.
           headers:
@@ -94,7 +119,8 @@ paths:
   /dataset/save:
     post:
       description: |
-        Return JWT token
+        Save dataset into PDND. Remember only user with particula privileges can use
+        this API.
       operationId: app.dataset_save
       security:
         - jwt: []
@@ -139,7 +165,46 @@ paths:
             <<: *ratelimit-headers
       summary: Return pdnd jwt token
       tags:
-      - Search
+      - Datasets
+  /dataset/save_to_test:
+    post:
+      description: |
+        Save dataset into 
+      operationId: app.dataset_save_test
+      security:
+        - jwt: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              x-body-name: file
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                name:
+                  type: string
+              required:
+                - file
+          #description: filter to use in search
+          #required: true
+      responses:
+        <<: *common-responses
+        '200':
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchResult'
+          description: |
+            JWT token.
+          headers:
+            <<: *ratelimit-headers
+      summary: Return pdnd jwt token
+      tags:
+      - Datasets
 components:
   securitySchemes:
     jwt:

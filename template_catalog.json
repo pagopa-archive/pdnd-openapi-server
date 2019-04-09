@@ -70,7 +70,7 @@
     "dataset_proc": {
       "merge_strategy": "sync",
       "scheduling_strategy": "TIMER_DRIVEN",
-      "cron": "3 min",
+      "cron": "5 sec",
       "dataset_type": "batch",
       "read_type": "last_update"
     },

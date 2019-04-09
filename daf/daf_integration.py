@@ -2,6 +2,10 @@ import requests
 import json
 import time
 import datetime
+import os
+from flask import jsonify
+from time import sleep
+
 
 FLATSCHEMA_TEMPLATE = json.loads("""{
         "name": "id",
@@ -63,7 +67,6 @@ def createKyloFeed(metacatalog, header):
       'accept': 'application/json',
       'authorization': header
     }
-    print(json.dumps(metacatalog))
     response = requests.post(startKyloUrl, data=json.dumps(metacatalog), headers=headers)
     print("QUI CI SONO")
     print(response.status_code)
@@ -91,10 +94,11 @@ def createMetacalog(metacatalog, header):
 def startFeedJob(orgName,datasetName, header):
     starNifiUrl = "https://api.daf.teamdigitale.it/catalog-manager/v1/nifi/start/" + orgName +"/" + datasetName
     payload = ""
+    print(header)
     headers = {
       'Content-Type': 'application/json', 
       'Accept': 'application/json',
-      'authorization': header
+      'Authorization': header
       }
     response = requests.request("GET", starNifiUrl, headers=headers)
     print(response.status_code)
@@ -102,7 +106,7 @@ def startFeedJob(orgName,datasetName, header):
        return True
     return False
 
-def saveOrUpdateFile(file, metacatalog, header):
+def saveOrUpdateFile(fileToUpload, metacatalog, header):
   #url = "https://api.daf.teamdigitale.it/hdfs/proxy/uploads/d_ale/GOVE/amministrazione/anpr_previsioni_grezze_test/anpr_raw_forecast_18_months_28102018_182850.csv?op=CREATE"
   genericUrl = metacatalog['operational']['input_src']['srv_push'][0]['url']
   ts = str(int(time.time()))
@@ -110,11 +114,14 @@ def saveOrUpdateFile(file, metacatalog, header):
   url = genericUrl + name + '_' + ts + '.csv?op=CREATE'
   print('URL')
   print(url)
-  payload = file
+  fileToUpload.save('./tmp.csv')
+  payload = open('./tmp.csv', 'rb').read()
+  #payload = fileToUpload.read()
   headers = {
       'content-type': "text/csv",
       'authorization': header
       }
+  sleep(30)
   response = requests.request("PUT", url, data=payload, headers=headers)
   if response.status_code == 200:
     return 200
@@ -175,7 +182,6 @@ def setOperational(template, form, nameSingle):
     template['operational']['input_src']['srv_push'][0]['param'] = fileType
     return template
 
-
 '''
 Dataset Param to pass:
 name
@@ -185,12 +191,12 @@ org
 user 
 description
 '''
-def saveInDaf(file,form,header):
-        fileOriginal = file
+def saveInDaf(fileToUpload,form,header):
+        fileOriginal = fileToUpload
         fileToUpload = fileOriginal
         originalKyloSchema = getKyloSchema(fileOriginal,header)
         kyloSchema = json.loads(originalKyloSchema)
-        print(kyloSchema)
+        #print(kyloSchema)
         fields = extractFields(kyloSchema)
         template = loadTemplate('./template_catalog.json')
         nameSingle = form['name'].replace(' ', '_')
@@ -199,17 +205,21 @@ def saveInDaf(file,form,header):
             setDcatapit(template, form, nameSingle)
             setDataSchema(template, form, nameSingle, fields, originalKyloSchema)
             setOperational(template, form, nameSingle)
-            print(template)
+            #print(template)
             created = createKyloFeed(template, header)
             if  created == 200:
+                print(created.json)
                 print('creating on mongo')
                 catalogCreated = createMetacalog(template, header)
                 print('created on mongo')
                 if catalogCreated == 200:
                     print('saving on hdfs')
+                    print(os.fstat(fileToUpload.fileno()).st_size)
                     savedStatus = saveOrUpdateFile(fileToUpload, template, header) 
                     if savedStatus == 200:
-                      print('saved on hdfs')
-                      if startFeedJob(form['org'],nameSingle,header):
-                        return json.dumps({'success' : "created"})  
-        return json.dumps({'error' : 'error'})
+                      return {'success' : "created"}
+                      #print('saved on hdfs')
+                      #print(header)
+                      #if startFeedJob(form['org'],nameSingle,header):
+                      #  return json.dumps({'success' : "created"})  
+        return {'error' : 'error'}
