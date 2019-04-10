@@ -43,7 +43,7 @@ paths:
     get:
       description: |
         Return JWT token
-      operationId: app.status
+      operationId: openapi.status
       responses:
         <<: *common-responses
         '200':
@@ -65,7 +65,7 @@ paths:
     get:
       description: |
         Return JWT token
-      operationId: app.get_token
+      operationId: openapi.get_token
       security:
         - basic: []
       responses:
@@ -89,7 +89,7 @@ paths:
     post:
       description: |
         Return JWT token
-      operationId: app.public_data_search
+      operationId: openapi.public_data_search
       security:
         - jwt: []
       requestBody:
@@ -121,7 +121,7 @@ paths:
       description: |
         Save dataset into PDND. Remember only user with particula privileges can use
         this API.
-      operationId: app.dataset_save
+      operationId: openapi.dataset_save
       security:
         - jwt: []
       requestBody:
@@ -169,8 +169,8 @@ paths:
   /dataset/save_to_test:
     post:
       description: |
-        Save dataset into 
-      operationId: app.dataset_save_test
+        Save dataset into
+      operationId: openapi.dataset_save_test
       security:
         - jwt: []
       requestBody:
@@ -211,11 +211,11 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      x-bearerInfoFunc: app.forward_token
+      x-bearerInfoFunc: openapi.forward_token
     basic:
       type: http
       scheme: basic
-      x-basicInfoFunc: app.basic_auth
+      x-basicInfoFunc: openapi.basic_auth
   headers:
     X-RateLimit-Limit:
       $ref: 'https://teamdigitale.github.io/openapi/headers/v3.yaml#/X-RateLimit-Limit'
@@ -280,4 +280,4 @@ components:
         match:
           type: string
           description: the match result
-    
+
