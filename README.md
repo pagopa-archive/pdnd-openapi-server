@@ -2,7 +2,27 @@
 
 This server exposes API from [PDND](https://dataportal.daf.teamdigitale.it/) according to openapi 3 specification. It uses [connexion](https://github.com/zalando/connexion) framework for creating and exposing the server.
 
+### Test
+
+To test the API, just run
+
+
+```
+tox 
+
+```
+
+When debugging, you can run the following instead.
+
+
+```
+tox --  --pdb --pdb-failure -vs --nologcapture
+
+```
+
+
 ### Launch
+
 ```
 pip3 install -r requirements.txt
 python3 app.py

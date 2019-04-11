@@ -35,7 +35,8 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
   - description: Development server
-    url: http://localhost:8080/pdnd-openapi
+    url: http://localhost:8080/
+    x-sandbox: true
   - description: Test server
     url: https://api.daf.teamdigitale.it/pdnd-openapi
 paths:
@@ -43,17 +44,14 @@ paths:
     get:
       description: |
         Return JWT token
-      operationId: app.status
+      operationId: openapi.status
       responses:
         <<: *common-responses
         '200':
           content:
             'application/json':
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
+                $ref: 'https://raw.githubusercontent.com/teamdigitale/openapi/0.0.4/docs/definitions.yaml#/schemas/Problem'
           description: |
             Current status of api.
           headers:
@@ -64,8 +62,8 @@ paths:
   /jwt:
     get:
       description: |
-        Return JWT token
-      operationId: app.get_token
+        Return JWT token XXX document the authentication method to get the token.
+      operationId: openapi.get_token
       security:
         - basic: []
       responses:
@@ -89,7 +87,7 @@ paths:
     post:
       description: |
         Return JWT token
-      operationId: app.public_data_search
+      operationId: openapi.public_data_search
       security:
         - jwt: []
       requestBody:
@@ -121,7 +119,7 @@ paths:
       description: |
         Save dataset into PDND. Remember only user with particula privileges can use
         this API.
-      operationId: app.dataset_save
+      operationId: openapi.dataset_save
       security:
         - jwt: []
       requestBody:
@@ -169,8 +167,8 @@ paths:
   /dataset/save_to_test:
     post:
       description: |
-        Save dataset into 
-      operationId: app.dataset_save_test
+        Save dataset into
+      operationId: openapi.dataset_save_test
       security:
         - jwt: []
       requestBody:
@@ -211,33 +209,33 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      x-bearerInfoFunc: app.forward_token
+      x-bearerInfoFunc: openapi.forward_token
     basic:
       type: http
       scheme: basic
-      x-basicInfoFunc: app.basic_auth
+      x-basicInfoFunc: openapi.basic_auth
   headers:
     X-RateLimit-Limit:
-      $ref: 'https://teamdigitale.github.io/openapi/headers/v3.yaml#/X-RateLimit-Limit'
+      $ref: 'https://raw.githubusercontent.com/teamdigitale/openapi/0.0.4/docs/definitions.yaml#/headers/X-RateLimit-Limit'
     X-RateLimit-Remaining:
-      $ref: 'https://teamdigitale.github.io/openapi/headers/v3.yaml#/X-RateLimit-Remaining'
+      $ref: 'https://raw.githubusercontent.com/teamdigitale/openapi/0.0.4/docs/definitions.yaml#/headers/X-RateLimit-Remaining'
     X-RateLimit-Reset:
-      $ref: 'https://teamdigitale.github.io/openapi/headers/v3.yaml#/X-RateLimit-Reset'
+      $ref: 'https://raw.githubusercontent.com/teamdigitale/openapi/0.0.4/docs/definitions.yaml#/headers/X-RateLimit-Reset'
     Retry-After:
-      $ref: 'https://teamdigitale.github.io/openapi/headers/v3.yaml#/Retry-After'
+      $ref: 'https://raw.githubusercontent.com/teamdigitale/openapi/0.0.4/docs/definitions.yaml#/headers/Retry-After'
 
   responses:
     # Predefined error codes for this API
     400BadRequest:
-      $ref: 'https://teamdigitale.github.io/openapi/responses/v3.yaml#/400BadRequest'
+      $ref: 'https://raw.githubusercontent.com/teamdigitale/openapi/0.0.4/docs/definitions.yaml#/responses/400BadRequest'
     404NotFound:
-      $ref: 'https://teamdigitale.github.io/openapi/responses/v3.yaml#/404NotFound'
+      $ref: 'https://raw.githubusercontent.com/teamdigitale/openapi/0.0.4/docs/definitions.yaml#/responses/404NotFound'
     429TooManyRequests:
-      $ref: 'https://teamdigitale.github.io/openapi/responses/v3.yaml#/429TooManyRequests'
+      $ref: 'https://raw.githubusercontent.com/teamdigitale/openapi/0.0.4/docs/definitions.yaml#/responses/429TooManyRequests'
     503ServiceUnavailable:
-      $ref: 'https://teamdigitale.github.io/openapi/responses/v3.yaml#/503ServiceUnavailable'
+      $ref: 'https://raw.githubusercontent.com/teamdigitale/openapi/0.0.4/docs/definitions.yaml#/responses/503ServiceUnavailable'
     default:
-      $ref: 'https://teamdigitale.github.io/openapi/responses/v3.yaml#/default'
+      $ref: 'https://raw.githubusercontent.com/teamdigitale/openapi/0.0.4/docs/definitions.yaml#/responses/default'
   schemas:
     Filters:
       type: object
@@ -280,4 +278,4 @@ components:
         match:
           type: string
           description: the match result
-    
+
