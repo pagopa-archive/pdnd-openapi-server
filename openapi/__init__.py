@@ -7,7 +7,9 @@ import requests
 import json
 from daf.daf_integration import saveInDaf
 from flask import jsonify
+from connexion import problem
 
+from .util import loggable
 
 def forward_token(token):
     return  {'sub': 'user1', 'scope': ''}
@@ -21,21 +23,38 @@ def public_data_search(**filters):
     return response.json()
 
 def get_token():
+    """Forwards an authentication request to the daf backend.
+
+    :return:
+    """
+    backend_url = "https://api.daf.teamdigitale.it/security-manager/v1/token"
     header = connexion.request.headers['Authorization']
-    url = "https://api.daf.teamdigitale.it/security-manager/v1/token"
-    headers = {'Content-Type': 'application/json', 
+    headers = {'Content-Type': 'application/json',
                'Accept': 'application/json',
                'authorization': header}
-    response = requests.request("GET", url, headers=headers)
-    # response.text.replace('"','')
-    #return {"jwt" : response.text}
-    return jsonify({"jwt" : response.text.replace('"','')})
+    response = requests.request("GET", backend_url, headers=headers)
 
+    if response.status_code == 200:
+        # response.text.replace('"','')
+        #return {"jwt" : response.text}
+        return jsonify({"jwt" : response.text.replace('"','')})
+    # TODO log.error("Authentication error: %r", response.text)
+    return problem(status=401, title="Authentication failed", detail="Not allowed by authorization server.")
+
+@loggable
 def basic_auth(username, password, required_scopes=None):
-    print("ale")
+    """Authenticates connexion requests as specified in the docs.
+
+    See https://github.com/zalando/connexion/blob/master/docs/security.rst
+
+    :param username:
+    :param password:
+    :param required_scopes:
+    :return:
+    """
     header = connexion.request.headers['Authorization']
     print(header)
-    return  {'sub': 'user1', 'scope': ''}
+    return {'sub': 'user1', 'scope': ''}
 
 def dataset_save(file):
     print(file)
@@ -45,7 +64,7 @@ def dataset_save(file):
     #return "ale"
 
 def status():
-    return {"status" : "ok"}
+    return problem(status=200, title="OK", detail="Application is working normally")
 
 def dataset_save_test(file):
   header = connexion.request.headers['Authorization']
@@ -64,8 +83,3 @@ def dataset_save_test(file):
     return 200
   return 400
 
-
-if __name__ == '__main__':
-    app = connexion.FlaskApp(__name__, specification_dir='openapi/', options={"swagger_ui": True})
-    app.add_api('daf-openapi.yaml') #, validate_responses=True)
-    app.run(port=8080)
