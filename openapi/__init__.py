@@ -38,7 +38,8 @@ def get_token():
         # response.text.replace('"','')
         #return {"jwt" : response.text}
         return jsonify({"jwt" : response.text.replace('"','')})
-    return problem(status=401, title="authentication failed", detail=response.text)
+    # TODO log.error("Authentication error: %r", response.text)
+    return problem(status=401, title="Authentication failed", detail="Not allowed by authorization server.")
 
 @loggable
 def basic_auth(username, password, required_scopes=None):
