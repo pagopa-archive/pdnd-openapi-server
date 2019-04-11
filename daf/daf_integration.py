@@ -208,7 +208,6 @@ def saveInDaf(fileToUpload,form,header):
             #print(template)
             created = createKyloFeed(template, header)
             if  created == 200:
-                print(created.json)
                 print('creating on mongo')
                 catalogCreated = createMetacalog(template, header)
                 print('created on mongo')
