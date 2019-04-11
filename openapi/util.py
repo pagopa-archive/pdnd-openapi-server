@@ -1,5 +1,5 @@
-from functools import wraps
 import logging
+from functools import wraps
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("openapi")
@@ -14,7 +14,7 @@ def loggable(wrapped):
                     fname=wrapped.__name__, args=args, kwds=kwds
                 )
             )
-        except Exception as e:
+        except Exception:
             log.exception(wrapped)
 
         return wrapped(*args, **kwds)
