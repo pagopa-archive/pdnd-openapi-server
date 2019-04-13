@@ -24,8 +24,7 @@ tox --  --pdb --pdb-failure -vs --nologcapture
 ### Launch
 
 ```
-pip3 install -r requirements.txt
-python3 app.py
+tox -e run
 ```
 connect to [http://localhost:8080/pdnd-openapi/ui/](http://localhost:8080/pdnd-openapi/ui/)
 

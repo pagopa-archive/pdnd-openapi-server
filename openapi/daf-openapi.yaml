@@ -35,7 +35,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
   - description: Development server
-    url: http://localhost:8080/
+    url: http://localhost:8080/pdnd-openapi
     x-sandbox: true
   - description: Test server
     url: https://api.daf.teamdigitale.it/pdnd-openapi
@@ -86,7 +86,7 @@ paths:
   /public/search:
     post:
       description: |
-        Return JWT token
+        Search for datasets into PDND
       operationId: openapi.public_data_search
       security:
         - jwt: []
@@ -122,6 +122,7 @@ paths:
       operationId: openapi.dataset_save
       security:
         - jwt: []
+        - basic: []
       requestBody:
         content:
           multipart/form-data:
@@ -143,45 +144,6 @@ paths:
                 user:
                   type: string
                 description:
-                  type: string
-              required:
-                - file
-          #description: filter to use in search
-          #required: true
-      responses:
-        <<: *common-responses
-        '200':
-          content:
-            'application/json':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SearchResult'
-          description: |
-            JWT token.
-          headers:
-            <<: *ratelimit-headers
-      summary: Return pdnd jwt token
-      tags:
-      - Datasets
-  /dataset/save_to_test:
-    post:
-      description: |
-        Save dataset into
-      operationId: openapi.dataset_save_test
-      security:
-        - jwt: []
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              x-body-name: file
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-                name:
                   type: string
               required:
                 - file
@@ -266,6 +228,14 @@ components:
           type: string
         sharedWithMe:
           type: boolean
+      example:
+        text: immigrazione
+        index: []
+        org: []
+        theme: []
+        date: ""
+        status: []
+        order: score      
     SearchResult:
       type: object
       properties:

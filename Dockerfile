@@ -10,8 +10,8 @@ RUN git clone https://github.com/teamdigitale/pdnd-openapi-server.git
 
 WORKDIR /pdnd-openapi-server
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install tox
 
 EXPOSE 8080
 
-CMD ["python3", "app.py"]
+CMD ["tox", "-e run"]

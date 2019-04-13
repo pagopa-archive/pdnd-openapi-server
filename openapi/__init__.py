@@ -1,47 +1,66 @@
-import time
+import json
 
 import connexion
-import six
-from werkzeug.exceptions import Unauthorized
 import requests
-import json
-from daf.daf_integration import saveInDaf
-from flask import jsonify
 from connexion import problem
+from flask import jsonify
+
+from daf.daf_integration import saveInDaf
 
 from .util import loggable
 
-def forward_token(token):
-    return  {'sub': 'user1', 'scope': ''}
+BASE_URL = "https://api.daf.teamdigitale.it"
 
+
+def forward_token(token):
+    return {"sub": "user1", "scope": ""}
+
+@loggable
 def public_data_search(**filters):
-    url = "https://api.daf.teamdigitale.it/dati-gov/v1/public/elasticsearch/search"
-    headers = {'Content-Type': 'application/json', 'Accept': 'application/json'} #'Authorization': header}
-    print(filters['filters'])
-    response = requests.post(url, data=json.dumps(filters['filters']), headers=headers)
-    print(response.json())
+    """Search for a dataset as serach for keywords in documente.
+
+    See openapi file for a working example and parameter passes
+
+    :param filters:
+    :return:
+    """
+    url = f"{BASE_URL}/dati-gov/v1/public/elasticsearch/search"
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }  # 'Authorization': header}
+    response = requests.post(
+        url, data=json.dumps(filters["filters"]), headers=headers
+    )
     return response.json()
 
+@loggable
 def get_token():
     """Forwards an authentication request to the daf backend.
 
     :return:
     """
-    backend_url = "https://api.daf.teamdigitale.it/security-manager/v1/token"
-    header = connexion.request.headers['Authorization']
-    headers = {'Content-Type': 'application/json',
-               'Accept': 'application/json',
-               'authorization': header}
+    backend_url = f"{BASE_URL}/security-manager/v1/token"
+    header = connexion.request.headers["Authorization"]
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "authorization": header,
+    }
     response = requests.request("GET", backend_url, headers=headers)
 
     if response.status_code == 200:
         # response.text.replace('"','')
-        #return {"jwt" : response.text}
-        return jsonify({"jwt" : response.text.replace('"','')})
+        # return {"jwt" : response.text}
+        return jsonify({"jwt": response.text.replace('"', "")})
     # TODO log.error("Authentication error: %r", response.text)
-    return problem(status=401, title="Authentication failed", detail="Not allowed by authorization server.")
+    return problem(
+        status=401,
+        title="Authentication failed",
+        detail="Not allowed by authorization server.",
+    )
 
-@loggable
+
 def basic_auth(username, password, required_scopes=None):
     """Authenticates connexion requests as specified in the docs.
 
@@ -52,34 +71,25 @@ def basic_auth(username, password, required_scopes=None):
     :param required_scopes:
     :return:
     """
-    header = connexion.request.headers['Authorization']
+    header = connexion.request.headers["Authorization"]
     print(header)
-    return {'sub': 'user1', 'scope': ''}
+    return {"sub": "user1", "scope": ""}
 
+@loggable
 def dataset_save(file):
-    print(file)
-    print(connexion.request.form)
-    header = connexion.request.headers['Authorization']
-    return saveInDaf(file,connexion.request.form, header)
-    #return "ale"
+    """Save or update a dataset into PNDN.
 
+    See swagger example for object passed via multipart/form
+
+    :param file:
+    :return:
+    """
+    header = connexion.request.headers["Authorization"]
+    return saveInDaf(file, connexion.request.form, header)
+    # return "ale"
+
+@loggable
 def status():
-    return problem(status=200, title="OK", detail="Application is working normally")
-
-def dataset_save_test(file):
-  header = connexion.request.headers['Authorization']
-  url = 'https://api.daf.teamdigitale.it/hdfs/proxy/uploads/d_ale/GOVE/amministrazione/test_pdnd_api_9/test_pdnd_api_9_1554715519.csv?op=CREATE'
-  print('URL')
-  print(url)
-  file.save('./tmp.csv')
-  payload = open('./tmp.csv', 'rb').read()
-  #payload = fileToUpload.read()
-  headers = {
-      'content-type': "text/csv",
-      'authorization': header
-      }
-  response = requests.request("PUT", url, data=payload, headers=headers)
-  if response.status_code == 200:
-    return 200
-  return 400
-
+    return problem(
+        status=200, title="OK", detail="Application is working normally"
+    )

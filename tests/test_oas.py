@@ -6,8 +6,8 @@ import sys
 from base64 import encodestring
 
 import connexion
-
 from flask_testing import TestCase
+
 from util import FakeResolver
 
 me = sys.modules[__name__]
