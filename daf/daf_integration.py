@@ -39,10 +39,10 @@ def generateFlatSchema(fields, FLATSCHEMA_TEMPLATE):
 
 
 def isPresentOnDaf(name, header):
-    isPresentUrl = (
-        f"https://api.daf.teamdigitale.it/catalog-manager"
+    isPresentUrl = \
+        "https://api.daf.teamdigitale.it/catalog-manager" +
         "/v1/catalog-ds/is_present/{name}"
-    )
+    
     payload = ""
     headers = {"authorization": header}
     response = requests.request(
