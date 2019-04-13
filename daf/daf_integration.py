@@ -39,9 +39,8 @@ def generateFlatSchema(fields, FLATSCHEMA_TEMPLATE):
 
 
 def isPresentOnDaf(name, header):
-    isPresentUrl = \
-        "https://api.daf.teamdigitale.it/catalog-manager" +
-        "/v1/catalog-ds/is_present/{name}"
+    isPresentUrl = ("https://api.daf.teamdigitale.it/catalog-manager" + 
+        "/v1/catalog-ds/is_present/" + name) 
     
     payload = ""
     headers = {"authorization": header}
@@ -233,6 +232,7 @@ def saveInDaf(fileToUpload,form,header):
         fields = extractFields(kyloSchema)
         template = loadTemplate('./template_catalog.json')
         nameSingle = form['name'].replace(' ', '_')
+        print("ale")
         if not isPresentOnDaf(nameSingle, header):
             print('go forward')
             setDcatapit(template, form, nameSingle)
