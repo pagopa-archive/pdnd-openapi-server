@@ -14,4 +14,4 @@ RUN pip3 install tox
 
 EXPOSE 8080
 
-CMD ["tox", "-e run"]
+CMD ["tox", "-e", "run"]

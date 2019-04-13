@@ -24,7 +24,7 @@ def public_data_search(**filters):
     :param filters:
     :return:
     """
-    url = f"{BASE_URL}/dati-gov/v1/public/elasticsearch/search"
+    url = BASE_URL + "/dati-gov/v1/public/elasticsearch/search"
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
@@ -40,7 +40,7 @@ def get_token():
 
     :return:
     """
-    backend_url = f"{BASE_URL}/security-manager/v1/token"
+    backend_url = BASE_URL + "/security-manager/v1/token"
     header = connexion.request.headers["Authorization"]
     headers = {
         "Content-Type": "application/json",
