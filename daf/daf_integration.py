@@ -228,16 +228,15 @@ description
 def saveInDaf(fileToUpload,form,header):
         originalKyloSchema = getKyloSchema(fileToUpload,header)
         kyloSchema = json.loads(originalKyloSchema)
-        #print(kyloSchema)
+        fileToUpload.seek(0)
         fields = extractFields(kyloSchema)
         template = loadTemplate('./template_catalog.json')
         nameSingle = form['name'].replace(' ', '_')
-        print("ale")
+        setDcatapit(template, form, nameSingle)
+        setDataSchema(template, form, nameSingle, fields, originalKyloSchema)
+        setOperational(template, form, nameSingle)
         if not isPresentOnDaf(nameSingle, header):
             print('go forward')
-            setDcatapit(template, form, nameSingle)
-            setDataSchema(template, form, nameSingle, fields, originalKyloSchema)
-            setOperational(template, form, nameSingle)
             #print(template)
             created = createKyloFeed(template, header)
             if  created == 200:
@@ -246,8 +245,11 @@ def saveInDaf(fileToUpload,form,header):
                 print('created on mongo')
                 if catalogCreated == 200:
                     print('saving on hdfs')
-                    fileToUpload.seek(0)
                     savedStatus = saveOrUpdateFile(fileToUpload, template, header) 
                     if savedStatus == 200:
                       return {'success' : "created"} 
-        return {'error' : 'error'}
+        else:
+            savedStatus = saveOrUpdateFile(fileToUpload, template, header)
+            if savedStatus == 200:
+                return {'success' : 'updated'}
+            return {'error' : 'error'}
