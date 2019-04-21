@@ -86,7 +86,7 @@ paths:
   /public/search:
     post:
       description: |
-        Search for datasets into PDND
+        Search for public datasets present on PDND
       operationId: openapi.public_data_search
       security:
         - jwt: []
@@ -117,7 +117,8 @@ paths:
   /dataset/save:
     post:
       description: |
-        Save dataset into PDND. Remember only user with particula privileges can use
+        Save dataset into PDND. It performs an upsert operation, if dataset is present by name it will try to update, 
+        otherwise try to create a new one. Remember only user with particular privileges (admin or editor) can use
         this API.
       operationId: openapi.dataset_save
       security:
@@ -133,20 +134,35 @@ paths:
                 file:
                   type: string
                   format: binary
+                  description: file to upload
                 name:
                   type: string
+                  description: name of dataset to save, if name already present will try an update.
+                               The update will succedd only if the schema is the same of the previous 
+                               inserted file
                 theme:
                   type: string
+                  description: is the theme according to a controlled vocabulary
                 subtheme:
                   type: string
+                  description: is the subtheme according to a controlled vocabulary
                 org:
                   type: string
+                  description: is the organization name or workgroup the user belong
                 user:
                   type: string
+                  description: username choosen when registered
                 description:
                   type: string
+                  description: description of the dataset
               required:
                 - file
+                - user
+                - name
+                - theme
+                - subtheme
+                - description
+                - org
           #description: filter to use in search
           #required: true
       responses:
@@ -162,7 +178,7 @@ paths:
             JWT token.
           headers:
             <<: *ratelimit-headers
-      summary: Return pdnd jwt token
+      summary: only EDITOR or ADMIN user can perform save. It is an upsert operation 
       tags:
       - Datasets
 components:
