@@ -38,7 +38,9 @@ servers:
     url: http://localhost:8080/pdnd-openapi
     x-sandbox: true
   - description: Test server
-    url: https://api.daf.teamdigitale.it/pdnd-openapi
+    url: https://api.daf.teamdigitale.test/pdnd-openapi
+  - description: Prod server
+    url: https://api.daf.teamdigitale.prod/pdnd-openapi
 paths:
   /status:
     get:
