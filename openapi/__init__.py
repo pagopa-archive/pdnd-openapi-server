@@ -17,7 +17,7 @@ def forward_token(token):
 
 @loggable
 def public_data_search(**filters):
-    """Search for a dataset as serach for keywords in documente.
+    """Search for a dataset as search for keywords in document.
 
     See openapi file for a working example and parameter passes
 

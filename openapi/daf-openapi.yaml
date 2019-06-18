@@ -53,7 +53,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: 'https://raw.githubusercontent.com/teamdigitale/openapi/0.0.4/docs/definitions.yaml#/schemas/Problem'
+                $ref: 'https://raw.githubusercontent.com/teamdigitale/openapi/0.0.4/docs/definitions.yaml#/schemas/Problem'  
           description: |
             Current status of api.
           headers:
@@ -90,8 +90,8 @@ paths:
       description: |
         Search for public datasets present on PDND
       operationId: openapi.public_data_search
-      security:
-        - jwt: []
+      #security:
+      #  - jwt: []
       requestBody:
           content:
             application/json:

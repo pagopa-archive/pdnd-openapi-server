@@ -1,2 +1,3 @@
 nose
 flask-testing
+requests

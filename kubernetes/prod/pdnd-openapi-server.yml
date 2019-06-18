@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pdnd-openapi-server
+spec:
+  ports:
+  - name: pdnd-openapi-server
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: pdnd-openapi-server
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: pdnd-openapi-server-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pdnd-openapi-server
+    spec:
+      hostAliases:
+      containers:
+        - name: pdnd-openapi-server
+          image: nexus.daf.teamdigitale.it/pdnd-openapi-server:latest
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: 4096Mi
+      imagePullSecrets:
+        - name: regsecret
+      volumes:
+      - name: tz-config
+        hostPath:
+           path: /usr/share/zoneinfo/Europe/Rome
