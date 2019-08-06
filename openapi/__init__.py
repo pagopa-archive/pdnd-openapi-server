@@ -5,7 +5,9 @@ import requests
 from connexion import problem
 from flask import jsonify
 
-from daf.daf_integration import saveInDaf
+from daf.daf_save_dataset import saveInDaf
+from daf.daf_integration import *
+from ckan.ckan_integration import public_search
 
 from .util import loggable
 
@@ -24,15 +26,13 @@ def public_data_search(**filters):
     :param filters:
     :return:
     """
-    url = BASE_URL + "/dati-gov/v1/public/elasticsearch/search"
+    #url = BASE_URL + "/dati-gov/v1/public/elasticsearch/search"
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
     }  # 'Authorization': header}
-    response = requests.post(
-        url, data=json.dumps(filters["filters"]), headers=headers
-    )
-    return response.json()
+    public_search(filters["filters"],headers)
+    return search_dataset(filters["filters"],headers)
 
 @loggable
 def get_token():
@@ -50,8 +50,6 @@ def get_token():
     response = requests.request("GET", backend_url, headers=headers)
 
     if response.status_code == 200:
-        # response.text.replace('"','')
-        # return {"jwt" : response.text}
         return jsonify({"jwt": response.text.replace('"', "")})
     # TODO log.error("Authentication error: %r", response.text)
     return problem(
@@ -59,6 +57,50 @@ def get_token():
         title="Authentication failed",
         detail="Not allowed by authorization server.",
     )
+
+@loggable
+def dataset_by_name(name):
+    """Search dataset by name
+
+    :return:
+    {"name": metacatalog['dcatapit']['name'],
+    "logical_uri": metacatalog['operational']['logical_uri'],
+    "physical_uri": metacatalog['operational']['physical_uri'],
+    "isExtOpenData": 'ext_opendata' in metacatalog['operational']}
+    """
+    backend_url = BASE_URL + "/catalog-manager/v1/public/catalog-ds/getbyname/" + name
+    header = connexion.request.headers["Authorization"]
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "authorization": header,
+    }
+    response = requests.request("GET", backend_url, headers=headers)
+    print(response.status_code)
+    if response.status_code == 200:
+        # response.text.replace('"','')
+        # return {"jwt" : response.text}
+        metacatalog = response.json()
+        print(json.dumps(response.json(), indent=4, sort_keys=True))
+        return jsonify({
+            "name": metacatalog['dcatapit']['name'],
+            "logical_uri": metacatalog['operational']['logical_uri'],
+            "physical_uri": metacatalog['operational']['physical_uri'],\
+            "isExtOpenData": 'ext_opendata' in metacatalog['operational']
+        })
+    # TODO log.error("Authentication error: %r", response.text)
+    elif response.status_code == 401:
+        return problem(
+            status=401,
+            title="Authentication failed",
+            detail="Not allowed by authorization server.",
+        )
+    else:
+        return problem(
+            status=404,
+            title="Url not found",
+            detail="The dataset not found on pdnd",
+        )   
 
 
 def basic_auth(username, password, required_scopes=None):
@@ -93,3 +135,11 @@ def status():
     return problem(
         status=200, title="OK", detail="Application is working normally"
     )
+
+@loggable
+def pdnd_search(**filters):
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+        return search_dataset(filters, headers)

@@ -85,7 +85,7 @@ paths:
       summary: Return pdnd jwt token
       tags:
       - Login
-  /public/search:
+  /dataset/public/search:
     post:
       description: |
         Search for public datasets present on PDND
@@ -110,12 +110,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/SearchResult'
           description: |
-            JWT token.
+            Search for a dataset from pdnd
           headers:
             <<: *ratelimit-headers
-      summary: Return pdnd jwt token
+      summary: Search for a dataset from pdnd
       tags:
-      - Search
+      - Datasets
   /dataset/save:
     post:
       description: |
@@ -183,6 +183,65 @@ paths:
       summary: only EDITOR or ADMIN user can perform save. It is an upsert operation 
       tags:
       - Datasets
+  /pdnd-nteract/dataset/{name}:
+    get:
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+          required: true
+          description: unique name of dataaset into pdnd
+      description: |
+        Return metadata about dataset that can be used to load dataset in a cell
+      operationId: openapi.dataset_by_name
+      security:
+        - jwt: []
+      responses:
+        <<: *common-responses
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/MetaInfo'
+          description: |
+            Return metadata about dataset name uri for api etc....
+          headers:
+            <<: *ratelimit-headers
+      summary: Return metadata about dataset name uri for api etc....
+      tags:
+      - PDND nteract
+  /pdnd-nteract/search:
+    post:
+      description: |
+        Search for public datasets present on PDND
+      operationId: openapi.pdnd_search
+      #security:
+      #  - jwt: []
+      requestBody:
+          content:
+            application/json:
+              schema:
+                 x-body-name: filters
+                 $ref: '#/components/schemas/Filters'
+          #description: filter to use in search
+          #required: true
+      responses:
+        <<: *common-responses
+        '200':
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchResult'
+          description: |
+            Search for a dataset from pdnd
+          headers:
+            <<: *ratelimit-headers
+      summary: Search for a dataset from pdnd
+      tags:
+      - PDND nteract
 components:
   securitySchemes:
     jwt:
@@ -266,4 +325,18 @@ components:
         match:
           type: string
           description: the match result
-
+    MetaInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          description: name of the dataset
+        logical_uri: 
+          type: string
+          description: logical uri of metacalog
+        physical_uri:
+          type: string
+          description: physical uri of metacalog
+        isExtOpenData:
+          type: boolean
+          description: is an external open data on PDND
