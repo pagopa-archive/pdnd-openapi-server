@@ -10,7 +10,5 @@ def public_search(filters, headers):
         result = r.json()['result']
         if result['count'] > 0:
             results = result['results']
-            csvs = [x for x in results if x['format'].lower() == 'csv']
-            print(csvs)
-            print('eccomi')
-    print('ci sono')
+            csvs = [{'name': x['name'], 'url': x['url']} for x in results if x['format'].lower() == 'csv']
+    return csvs

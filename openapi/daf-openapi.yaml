@@ -242,6 +242,37 @@ paths:
       summary: Search for a dataset from pdnd
       tags:
       - PDND nteract
+  /pdnd-nteract/search_ckan:
+    post:
+      description: |
+        search_ckan
+      operationId: openapi.pdnd_search_ckan
+      #security:
+      #  - jwt: []
+      requestBody:
+          content:
+            application/json:
+              schema:
+                 x-body-name: filters
+                 $ref: '#/components/schemas/Filters'
+          #description: filter to use in search
+          #required: true
+      responses:
+        <<: *common-responses
+        '200':
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchResult'
+          description: |
+            Search for a dataset from ckan
+          headers:
+            <<: *ratelimit-headers
+      summary: Search for a dataset from ckan
+      tags:
+      - PDND nteract
 components:
   securitySchemes:
     jwt:
