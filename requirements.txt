@@ -3,3 +3,4 @@ python-jose[cryptography]
 six>=1.9
 Flask>=1.0.2
 requests
+flask_cors

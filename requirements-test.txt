@@ -1,3 +1,4 @@
 nose
 flask-testing
 requests
+flask_cors
