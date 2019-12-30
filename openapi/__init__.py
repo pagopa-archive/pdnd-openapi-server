@@ -143,3 +143,11 @@ def pdnd_search(**filters):
             "Accept": "application/json",
         }
         return search_dataset(filters, headers)
+
+@loggable
+def pdnd_search_ckan(**filters):
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+        return public_search(filters["filters"],headers)
