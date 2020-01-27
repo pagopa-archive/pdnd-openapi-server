@@ -7,6 +7,7 @@ def public_search(filters, headers):
     url = 'https://ckan.dev.pdnd.italia.it/api/3/action/resource_search?query=name:' + name
     print(url)
     r = requests.get(url)
+    csvs = []
     if r.status_code == 200:
         result = r.json()['result']
         if result['count'] > 0:
