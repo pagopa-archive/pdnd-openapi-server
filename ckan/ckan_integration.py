@@ -17,7 +17,8 @@ def public_search(filters, headers):
             # only for  data.gov
             for res in results:
                 resources = res['resources']
-                csv = [{'name': x['name'], 'url': x['url']} for x in resources if x['format'].lower() == 'csv']
+                name = res['title']
+                csv = [{'name': name, 'url': x['url']} for x in resources if x['format'].lower() == 'csv']
                 for info in csv:
                     csvs.append(info)
     return csvs
